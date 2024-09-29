@@ -30,25 +30,7 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 
-app.use(notExistPage.NotExistPage);
 
-// var convertDateToBinary = function(date) {
-//     const num = date.split('-')
-//     let answer=''
-//     for (const numElement of num) {
-//         if (Number(numElement) === 1){
-//             answer = answer + 1 + '-'
-//         }else{
-//             answer = answer + decimalToBinary(Number(numElement)) + '-'
-//
-//         }
-//     }
-//     console.log(answer = answer.substring(0, answer.length - 1))
-// };
-//
-// function decimalToBinary(decimalNumber) {
-//     return decimalNumber.toString(2);
-// };
-// convertDateToBinary('1900-01-01')
+app.use(notExistPage.NotExistPage);
 
 app.listen(3001);

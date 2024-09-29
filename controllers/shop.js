@@ -35,6 +35,13 @@ exports.getCart = (req,res,next)=>{
         });
     });
 }
+
+exports.postCart = (req,res,next)=>{
+    const prodId = req.body.productId;
+    console.log(prodId)
+    res.redirect('/cart')
+}
+
 exports.Checkout = (req,res,next)=>{
     Product.fetchAll((products)=>{
         res.render('shop/checkout', {
@@ -43,5 +50,21 @@ exports.Checkout = (req,res,next)=>{
             pageTitle: "Checkout Page",
         });
     });
+}
+
+exports.getProduct = (req,res,next)=>{
+    const prodId = req.params.productId;
+
+    Product.findById(prodId, product =>{
+        res.render('shop/product-details', {
+            prods: product,
+            path: '/product',
+            pageTitle: `Product ${product.title}`,
+        });
+
+    })
+
+
+    // res.redirect('/')
 }
 
