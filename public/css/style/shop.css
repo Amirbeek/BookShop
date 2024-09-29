@@ -1,0 +1,121 @@
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Arial', sans-serif; /* Changed font for better readability */
+    background-color: #f9f9f9; /* Light background for contrast */
+}
+.main-header {
+    width: 100%;
+    height: 3.5rem;
+    background-color: #dbc441;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Added shadow for depth */
+}
+.main-header-nav {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+}
+.main-header__items-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.main-header__item {
+    margin: 0 1rem;
+}
+.main-header__item a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold; /* Make links stand out */
+    transition: color 0.3s; /* Smooth transition for hover effects */
+}
+.main-header__item a:hover,
+.main-header__item a:active,
+.main-header__item a.active {
+    color: #6200ff;
+}
+main {
+    padding: 2rem; /* Added padding for main content */
+    text-align: center; /* Centered text for a cleaner look */
+}
+h1 {
+    margin-bottom: 1rem; /* Space between heading and paragraph */
+    font-size: 2rem; /* Increased font size for emphasis */
+    color: #333; /* Dark color for better contrast */
+}
+p {
+    font-size: 1rem; /* Adjusted font size */
+    color: #666; /* Softer color for the paragraph */
+}
+/* Grid layouts for product items */
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.card.product-item {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.card.product-item:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card__header h1 {
+    font-size: 1.5rem;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.card__image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card__content {
+    padding: 15px;
+    text-align: center;
+}
+
+.card__content h2.product_price {
+    font-size: 1.3rem;
+    color: #333;
+    margin: 10px 0;
+}
+
+.card__content p.product__description {
+    font-size: 1rem;
+    color: #777;
+    line-height: 1.5;
+}
+
+.card__actions {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.card__actions .btn {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.card__actions .btn:hover {
+    background-color: #4cae4c;
+}
