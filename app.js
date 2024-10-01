@@ -33,4 +33,4 @@ app.use(shopRoutes);
 
 app.use(notExistPage.NotExistPage);
 
-app.listen(3001);
+app.listen(3000);

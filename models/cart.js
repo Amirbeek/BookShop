@@ -9,6 +9,11 @@ module.exports = class Cart {
             let cart = { products: [], totalPrice: 0 };
             if (!err && fileContent.length > 0) {
                 cart = JSON.parse(fileContent); // If file is not empty, parse the existing content
+
+            }
+            // Ensure products array exists
+            if (!cart.products) {
+                cart.products = [];
             }
 
             // Analyze the cart => Find existing product
