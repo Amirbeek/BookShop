@@ -6,24 +6,29 @@
 <%- include('../includes/navigation.ejs') %>
 
 <main>
-    <form action="/admin/edit-product" method="POST" class="product-form">
+    <form action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" class="product-form">
+        <% if (editing) { %>
+            <input type="hidden" name="productId" value="<%= product._id %>">
+        <% } %>
         <div class="form-control">
             <label for="title">Title</label>
-            <input type="text" name="title" id="title" required>
+            <input type="text" name="title" id="title" value="<%= editing ? product.title : '' %>" required>
         </div>
         <div class="form-control">
             <label for="imgUrl">Image Url</label>
-            <input type="text" name="imgUrl" id="imgUrl" required><br><br>
+            <input type="text" name="imgUrl" id="imgUrl" value="<%= editing ? product.imgUrl : '' %>" required>
         </div>
         <div class="form-control">
             <label for="desc">Description</label>
-            <input type="text" name="description" id="desc" required>
+            <input type="text" name="description" id="desc" value="<%= editing ? product.description : '' %>" required>
         </div>
         <div class="form-control">
             <label for="price">Price</label>
-            <input type="number" name="price" id="price" required>
+            <input type="number" name="price" id="price" value="<%= editing ? product.price : '' %>" required>
         </div>
-        <button type="submit">Submit</button>
+        <button type="submit">
+            <%= editing ? 'Edit Product' : 'Add Product' %>
+        </button>
     </form>
 </main>
 

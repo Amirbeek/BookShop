@@ -4,19 +4,32 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: "Add Shop",
         path: '/admin/add-product',
+        editing: false
     });
 };
+
 exports.getEditProduct = (req, res, next) => {
-    const editMode = res.query.edit;
+    const editMode = req.query.edit;
+    console.log(editMode)
     if (!editMode){
         return res.redirect('/')
     }
-    res.render('admin/edit-product', {
-        pageTitle: "Edit Page",
-        path: '/admin/edit-product',
-        editing: editMode
+    const productID = req.params.productId
+    Product.findById(productID, product=>{
+        if (!product){
+            return res.redirect('/')
+        }
+        res.render('admin/edit-product', {
+            pageTitle: "Edit Page",
+            path: '/admin/edit-product',
+            editing: editMode,
+            product: product
+        });
     });
 };
+exports.postEditProduct = (req,res,next) => {
+
+}
 
 exports.postAddProduct = (req, res, next) => {
     const newProduct = new Product(
@@ -24,7 +37,6 @@ exports.postAddProduct = (req, res, next) => {
         req.body.imgUrl,
         req.body.description,
         req.body.price);
-
     newProduct.save();
     res.redirect('/');
 };
