@@ -6,10 +6,7 @@
 <%- include('../includes/navigation.ejs') %>
 
 <main>
-    <form action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST" class="product-form">
-        <% if (editing) { %>
-            <input type="hidden" name="productId" value="<%= product._id %>">
-        <% } %>
+    <form action="/admin/<%= editing ? 'edit-product':'add-product'%>" method="POST" class="product-form">
         <div class="form-control">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" value="<%= editing ? product.title : '' %>" required>
@@ -26,6 +23,10 @@
             <label for="price">Price</label>
             <input type="number" name="price" id="price" value="<%= editing ? product.price : '' %>" required>
         </div>
+        <%if (editing){%>
+        <input type="hidden" name="id" value="<%=product.id%>">
+        <%}%>
+
         <button type="submit">
             <%= editing ? 'Edit Product' : 'Add Product' %>
         </button>

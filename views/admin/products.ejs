@@ -17,20 +17,19 @@
                     <img src="<%= product.imgUrl%>" alt="Shop Image">
                 </div>
                 <div class="card__content">
-                    <h2 class="product_price"><%= product.price %></h2>
-                    <p class="product__description"><%= product.title %></p>
+                    <h2 class="product_price">$<%= product.price %></h2>
+                    <p class="product__description"><%= product.description %></p>
                 </div>
                 <div class="card__actions">
-                    <%product.id%>
-                    <a href="/admin/edit-product/<%=product.id%>?edit=true" class="btn">Edit</a>
+                    <a href="/admin/edit-product/<%=product.id%>?edit=true" class="btn">Edit</a><br><br><br>
                     <form action="/admin/delete-product" method="POST">
-                        <a href="/admin/delete-product" type="submit" class="btn">Delete</a>
+                        <input type="hidden" name="productId" value="<%= product.id %>">
+                        <button type="submit" class="btn">Delete</button>
                     </form>
                 </div>
             </article>
 
         <% }%>
-
         <% }else{  %>
             <h1>No Products Found</h1>
         <% } %>
