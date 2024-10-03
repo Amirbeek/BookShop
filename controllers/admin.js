@@ -51,24 +51,29 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-    const newProduct = new Product(
-        null,
+    const newProduct = new Product(null,
         req.body.title,
-        req.body.imgUrl,
         req.body.description,
+        req.body.imgUrl,
         req.body.price
     );
-    newProduct.save(); // Save a new product
-    res.redirect('/'); // Redirect after saving
+    newProduct.save().then(
+        res.redirect('/')
+    ).catch(err=>{
+        console.log(err)
+    })
+
 };
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll((products) => {
+    Product.fetchAll().then((products) => {
         res.render('admin/products', {
             prods: products,
             path: '/admin/products',
             pageTitle: "Admin Products",
         });
+    }).catch(err=>{
+        console.log(err)
     });
 };
 exports.deleteProduct = (req, res, next) => {
