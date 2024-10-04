@@ -1,4 +1,6 @@
 const Product = require("../models/product");
+const {log} = require("debug");
+const {result} = require("handlebars-helpers/lib/utils/utils");
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -14,7 +16,7 @@ exports.getEditProduct = (req, res, next) => {
         return res.redirect('/');
     }
     const productID = req.params.productId; // Get product ID from URL parameters
-    Product.findById(productID, (product) => {
+    Product.findByPk(productID, (product) => {
         if (!product) {
             return res.redirect('/'); // Redirect if product not found
         }
@@ -51,22 +53,25 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = (req, res, next) => {
-    const newProduct = new Product(null,
-        req.body.title,
-        req.body.description,
-        req.body.imgUrl,
-        req.body.price
-    );
-    newProduct.save().then(
-        res.redirect('/')
-    ).catch(err=>{
-        console.log(err)
-    })
+    const { title, price, imageUrl, description } = req.body;
 
+    Product.create({
+        title: title,
+        price: price,
+        imageUrl: imageUrl,
+        description: description
+    })
+        .then(result => {
+            res.redirect('/')
+        })
+        .catch(err => {
+            // console.error(err);
+            res.status(500).json({ message: 'Failed to create product', error: err });
+        });
 };
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll().then((products) => {
+    Product.findAll().then((products) => {
         res.render('admin/products', {
             prods: products,
             path: '/admin/products',

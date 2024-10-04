@@ -35,6 +35,7 @@
     "pug": "^3.0.3",
     "readdirp": "^3.6.0",
     "semver": "^7.6.3",
+    "sequelize": "^6.37.3",
     "simple-update-notifier": "^2.0.0",
     "supports-color": "^5.5.0",
     "to-regex-range": "^5.0.1",
@@ -49,6 +50,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "grunt": "^1.6.1",
     "nodemon": "^3.1.7"
   }
 }
