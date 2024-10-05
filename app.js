@@ -37,12 +37,13 @@ app.use(notExistPage.NotExistPage);
 
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
-User.hasOne(Cart)
-Cart.belongsTo(User)
 
+User.hasOne(Cart);
+Cart.belongsTo(User);
 
-Cart.belongsToMany(Product, {through: CartItem})
-Product.belongsTo(Cart)
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+
 
 sequelize.sync()
     .then(result => {
@@ -62,4 +63,4 @@ sequelize.sync()
         console.error('Failed to sync with database', err);
     });
 
-app.listen(3000)
+app.listen(3001)
