@@ -80,6 +80,7 @@ exports.getProducts = (req, res, next) => {
         console.log(err)
     });
 };
+
 exports.deleteProduct = (req, res, next) => {
     const productId = req.body.productId; // Get the product ID from the request body
     console.log(productId)

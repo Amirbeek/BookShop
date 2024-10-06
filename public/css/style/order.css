@@ -1,0 +1,70 @@
+/* General styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.orders-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title styles */
+.orders-title {
+    font-size: 24px;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* List styles */
+.orders-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.order-item {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.5rem;
+}
+
+.order-id {
+    font-size: 20px;
+    color: #007bff;
+}
+
+/* Product item styles */
+.order-products {
+    list-style-type: none;
+    padding: 0;
+    margin: 0.5rem 0 0 0;
+}
+
+.product-item {
+    font-size: 16px;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-title {
+    font-weight: 500;
+}
+
+.product-quantity {
+    color: #888;
+}
+
+/* No orders message */
+.no-orders {
+    color: #ff0000; /* Red color for emphasis */
+    font-size: 18px;
+    text-align: center;
+    margin-top: 1rem;
+}

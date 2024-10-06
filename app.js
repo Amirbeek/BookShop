@@ -8,6 +8,8 @@ const User = require('./models/user');
 const Product = require('./models/product');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
+const OrderItem = require('./models/order-items');
+const Order = require('./models/order');
 
 const app = express();
 
@@ -44,7 +46,9 @@ Cart.belongsTo(User);
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem });
 
-
+Order.belongsTo(User)
+User.hasMany(Order)
+Order.belongsToMany(Product, {through: OrderItem})
 sequelize.sync()
     .then(result => {
         return User.findByPk(1);
@@ -56,11 +60,10 @@ sequelize.sync()
         return user;
     })
     .then(user => {
-        console.log(user); // Logs the user (newly created or existing)
-        // Remove res.redirect('/admin/products') from here
+        console.log(user);
     })
     .catch(err => {
         console.error('Failed to sync with database', err);
     });
 
-app.listen(3001)
+app.listen(3002)
