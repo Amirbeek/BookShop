@@ -1,7 +1,6 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
-const {log} = require("debug");
 const {err, result} = require("handlebars-helpers/lib/utils/utils");
 
 exports.shopProduct = (req, res, next) => {
@@ -32,14 +31,7 @@ exports.getIndex = (req,res,next)=>{
     }).catch(err =>{
         console.log(err)
     })
-
-    // Product.findByPk().then((products)=>{
-    //     console.log(products)
-    //
-    // }).catch(err=>{
-    //     console.log(err)
-    // });
-}
+};
 
 exports.getCart = (req, res, next) => {
     req.user.getCart().then(cart=>{
@@ -105,7 +97,7 @@ exports.Checkout = (req,res,next)=>{
         console.log(err)
     })
 
-}
+};
 
 exports.getProduct = (req,res,next)=>{
     const prodId = req.params.productId;
@@ -118,7 +110,7 @@ exports.getProduct = (req,res,next)=>{
     }).catch(err=>{
         console.log(err)
     })
-}
+};
 
 exports.postCartDelete = (req,res,next)=>{
     const prodId = req.body.id;
