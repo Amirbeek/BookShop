@@ -1,6 +1,4 @@
 const Product = require("../models/product");
-const {log} = require("debug");
-const {result} = require("handlebars-helpers/lib/utils/utils");
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -53,7 +51,7 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const { title, price, imageUrl, description } = req.body;
-    const product = new Product(title,price, description,imageUrl)
+    const product = new Product(title,price, description,imageUrl, null,req.user._id)
     product.save()
         .then(user => {
         console.log(user);

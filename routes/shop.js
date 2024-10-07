@@ -12,7 +12,7 @@ shopRouter.get('/', shopController.getIndex);
 
 shopRouter.get('/products/:productId',shopController.getProduct)
 //
-// shopRouter.post('/add-to-cart', shopController.postCart)
+shopRouter.post('/add-to-cart', shopController.postCart)
 //
 shopRouter.get('/products',shopController.shopProduct)
 //
