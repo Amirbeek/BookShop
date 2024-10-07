@@ -24,7 +24,7 @@
             <input type="number" name="price" id="price" value="<%= editing ? product.price : '' %>" required>
         </div>
         <%if (editing){%>
-        <input type="hidden" name="id" value="<%=product.id%>">
+            <input type="hidden" name="id" value="<%=product._id%>">
         <%}%>
 
         <button type="submit">

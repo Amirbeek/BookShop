@@ -5,7 +5,7 @@
 <body>
 <main>
     <h1><%= prods.title %></h1>
-    <img src="<%= prods.imgUrl %>" alt="Product Image">
+    <img src="<%= prods.imageUrl %>" alt="Product Image">
     <p><%= prods.description %></p>
     <span class="product_price">$<%= prods.price %></span>
     <%- include('../includes/addToCart.ejs', { product: prods }) %>

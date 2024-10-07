@@ -11,20 +11,20 @@ shopRouter.get('/', shopController.getIndex);
 // shopRouter.get('/products/delete')
 
 shopRouter.get('/products/:productId',shopController.getProduct)
-
-shopRouter.post('/add-to-cart', shopController.postCart)
-
+//
+// shopRouter.post('/add-to-cart', shopController.postCart)
+//
 shopRouter.get('/products',shopController.shopProduct)
+//
+// shopRouter.get('/cart', shopController.getCart)
+//
+// shopRouter.get('/checkout', shopController.Checkout)
+//
+// shopRouter.get('/cart',shopController.getCart)
 
-shopRouter.get('/cart', shopController.getCart)
-
-shopRouter.get('/checkout', shopController.Checkout)
-
-shopRouter.get('/cart',shopController.getCart)
-
-shopRouter.post('/delete-cart-item',shopController.postCartDelete)
-
-shopRouter.post('/create-order', shopController.postOrder)
-
-shopRouter.get('/orders', shopController.getOrders)
+// shopRouter.post('/delete-cart-item',shopController.postCartDelete)
+//
+// shopRouter.post('/create-order', shopController.postOrder)
+//
+// shopRouter.get('/orders', shopController.getOrders)
 module.exports = shopRouter;

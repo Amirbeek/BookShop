@@ -16,8 +16,7 @@ exports.getEditProduct = (req, res, next) => {
         return res.redirect('/');
     }
     const productID = req.params.productId; // Get product ID from URL parameters
-    req.user.getProducts({where: {id: productID}}).then(product =>{
-            product = product[0]
+    Product.findById(productID).then(product =>{
             if (!product) {
                 return res.redirect('/'); // Redirect if product not found
             }
@@ -34,43 +33,38 @@ exports.getEditProduct = (req, res, next) => {
     });
 };
 
+const { ObjectId } = require('mongodb');
+
 exports.postEditProduct = (req, res, next) => {
     const productId = req.body.id;
     const { title, price, imageUrl, description } = req.body;
-    Product.findByPk(productId)
-        .then(product =>{
-        product.title = title
-        product.price = price
-        product.imageUrl = imageUrl
-        product.description = description
-        return  product.save()
-    }).then(result=>{
-        console.log(result)
-        res.redirect('/products');
-    }).catch(err =>{
-        console.log(err)
-    });
+    const product = new Product(title,price, description,imageUrl, new ObjectId(productId))
 
-};
-
-exports.postAddProduct = (req, res, next) => {
-    const { title, price, imageUrl, description } = req.body;
-    req.user.createProduct({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description
-    }).then(user => {
-        console.log(user); // This will log the user (either newly created or existing)
-        res.redirect('/admin/products')  // Error: res is not defined
-    }).catch(err => {
-            // console.error(err);
-            res.status(500).json({ message: 'Failed to create product', error: err });
+    product.save().then(result => {
+            console.log("Product updated:", result);
+            res.redirect('/admin/products');
+    })
+        .catch(err => {
+            console.error('Error updating product:', err);
+            res.status(500).send('Error updating product');
         });
 };
 
+
+exports.postAddProduct = (req, res, next) => {
+    const { title, price, imageUrl, description } = req.body;
+    const product = new Product(title,price, description,imageUrl)
+    product.save()
+        .then(user => {
+        console.log(user);
+        res.redirect('/admin/products')
+    }).catch(err => {
+        console.log(err)
+    });
+};
+
 exports.getProducts = (req, res, next) => {
-    req.user.getProducts().then((products) => {
+    Product.fetchALl().then((products) => {
         res.render('admin/products', {
             prods: products,
             path: '/admin/products',
@@ -80,12 +74,12 @@ exports.getProducts = (req, res, next) => {
         console.log(err)
     });
 };
-
+//
 exports.deleteProduct = (req, res, next) => {
     const productId = req.body.productId; // Get the product ID from the request body
     console.log(productId)
-    Product.findByPk(productId).then( product =>{
-        return product.destroy()
+    Product.deleteById(productId).then( result =>{
+        console.log(result)
     }).then(result=>{
         console.log(result)
         res.redirect('/');

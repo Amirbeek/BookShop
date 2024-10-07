@@ -12,14 +12,14 @@
                         <h1 class="product_title"><%= product.title %></h1>
                     </header>
                     <div class="card__image">
-                        <img src="<%= product.imgUrl %>" alt="Shop Image">
+                        <img src="<%= product.imageUrl %>" alt="Shop Image">
                     </div>
                     <div class="card__content">
                         <h2 class="product_price">$<%= product.price %></h2>
                         <p class="product__description"><%= product.description %></p>
                     </div>
                     <div class="card__actions">
-                        <a href="/products/<%=product.id%>" class="btn">Details</a><br><br>
+                        <a href="/products/<%=product._id%>" class="btn">Details</a><br><br>
                         <%- include('../includes/addToCart.ejs', { product: product }) %>
                     </div>
                 </article>
