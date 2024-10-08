@@ -22,7 +22,8 @@ const {err, result} = require("handlebars-helpers/lib/utils/utils");
 // };
 
 exports.getIndex = (req,res,next)=>{
-    Product.fetchALl().then(products => {
+    Product.find()
+        .then(products => {
         res.render('shop/index', {
             prods: products,
             path: '/',
@@ -33,7 +34,7 @@ exports.getIndex = (req,res,next)=>{
     })
 };
 exports.shopProduct = (req,res,next)=>{
-    Product.fetchALl().then(products => {
+    Product.find().then(products => {
         res.render('shop/index', {
             prods: products,
             path: '/',
@@ -45,30 +46,34 @@ exports.shopProduct = (req,res,next)=>{
 }
 
 exports.getCart = (req, res, next) => {
-    req.user.getCart().then(cart=>{
-        return cart.getProducts().then(products=>{
-            res.render('shop/cart',{
-                path:'/cart',
+    req.user.getCart()
+        .then(products => {
+            res.render('shop/cart', {
+                path: '/cart',
                 pageTitle: 'Your Cart',
                 cart: products
-            })
-        }).catch(err=>{
-            console.log(err)
+            });
         })
-    }).catch(err =>{
-        console.log(err)
-    })
+        .catch(err => {
+            console.log(err);
+        });
 };
+
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.findById(prodId).then(product =>{
-        return req.user.addToCart(product)
-    }).then(result =>{
-        console.log(result)
-    }).catch(err =>{
-        console.log(err)
-    })
+
+    Product.findById(prodId)
+        .then(product => {
+            return req.user.addToCart(product);
+        })
+        .then(result => {
+            console.log(result);
+            res.redirect('/cart');
+        })
+        .catch(err => {
+            console.log(err);
+        });
     // let fetchCart;
     // let newQuantity = 1;
     //
@@ -130,70 +135,42 @@ exports.getProduct = (req,res,next)=>{
     })
 };
 
-// exports.postCartDelete = (req,res,next)=>{
-//     const prodId = req.body.id;
-//     req.user.getCart().then(cart =>{
-//         return cart.getProducts({where: {id: prodId}})
-//             .then(products =>{
-//             const product = products[0]
-//             return product.cartItem.destroy()
-//         }).then(result =>{
-//             res.redirect('/cart')
-//         }).catch(err =>{
-//             console.log(err)
-//         })
-//     }).catch(err =>{
-//         console.log(err)
-//     })
+exports.postCartDelete = (req,res,next)=>{
+    const prodId = req.body.id;
+        req.user.removeFromCart(prodId)
+            .then(products =>{
+        }).then(result =>{
+            res.redirect('/cart')
+        }).catch(err =>{
+            console.log(err)
+        })
+
+}
 //
-// }
-//
-// exports.getOrders = (req, res, next) => {
-//     req.user.getOrders({include: ['products']})
-//         .then(orders => {
-//             console.log(orders)
-//             res.render('shop/orders', {
-//                 path: '/orders',
-//                 pageTitle: "Orders page",
-//                 orders: orders
-//             });
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).render('error', { errorMessage: 'Unable to fetch orders.' });
-//         });
-// };
-//
-// exports.postOrder = (req, res, next) => {
-//     let fetchCart;
-//     req.user.getCart()
-//         .then(cart => {
-//             if (!cart) {
-//                 throw new Error("Cart not found");
-//             }
-//             fetchCart = cart;
-//             return cart.getProducts();
-//         })
-//         .then(products => {
-//             if (products.length === 0) {
-//                 throw new Error("No products in cart");
-//             }
-//             return req.user.createOrder().then(order => {
-//                 const orderItems = products.map(product => {
-//                     product.orderItem = { quantity: product.cartItem.quantity };
-//                     return product;
-//                 });
-//                 return order.addProducts(orderItems);
-//             });
-//         })
-//         .then(result => {
-//             return fetchCart.setProducts(null);
-//         })
-//         .then(() => {
-//             res.redirect('/orders');
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).render('error', { errorMessage: 'Something went wrong while creating the order!' });
-//         });
-// };
+exports.getOrders = (req, res, next) => {
+    req.user.getOrder()
+        .then(orders => {
+            console.log(orders);
+            res.render('shop/orders', {
+                path: '/orders',
+                pageTitle: "Orders page",
+                orders: orders
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).render('error', { errorMessage: 'Unable to fetch orders.' });
+        });
+};
+
+exports.postOrder = (req, res, next) => {
+    req.user
+        .addOrders()
+        .then(result => {
+            res.redirect('/');
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).render('error', { errorMessage: 'Unable to place order.' });
+        });
+};

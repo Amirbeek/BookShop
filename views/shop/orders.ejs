@@ -8,16 +8,12 @@
         <ul class="orders-list">
             <% orders.forEach(order => { %>
                 <li class="order-item">
-                    <h2 class="order-id">Order #<%= order.id %></h2>
+                    <h2 class="order-id">Order #<%= order._id %></h2>
                     <ul class="order-products">
-                        <% order.products.forEach(item => { %>
+                        <% order.items.forEach(item => { %>
                             <li class="product-item">
                                 <span class="product-title"><%= item.title %></span>
-                                <span class="product-quantity">(<%= item.orderItem.quantity %>)</span>
-                                <form action="/delete-order" method="POST" class="delete-form">
-                                        <input type="hidden" name="id" value="<%= order.id %>">
-                                        <button type="submit" class="delete-button">Delete</button>
-                                </form>
+                                <span class="product-quantity">(<%= item.quantity %>)</span>
                             </li>
                         <% }) %>
                     </ul>

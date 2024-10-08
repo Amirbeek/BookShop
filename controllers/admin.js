@@ -10,9 +10,6 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit; // Check if it's in edit mode
-    if (!editMode) {
-        return res.redirect('/');
-    }
     const productID = req.params.productId; // Get product ID from URL parameters
     Product.findById(productID).then(product =>{
             if (!product) {
@@ -36,22 +33,21 @@ const { ObjectId } = require('mongodb');
 exports.postEditProduct = (req, res, next) => {
     const productId = req.body.id;
     const { title, price, imageUrl, description } = req.body;
-    const product = new Product(title,price, description,imageUrl, new ObjectId(productId))
 
-    product.save().then(result => {
+    Product.findByIdAndUpdate(productId, { title, price, description, imageUrl }, { new: true })
+        .then(result => {
             console.log("Product updated:", result);
             res.redirect('/admin/products');
-    })
+        })
         .catch(err => {
             console.error('Error updating product:', err);
             res.status(500).send('Error updating product');
         });
 };
 
-
 exports.postAddProduct = (req, res, next) => {
     const { title, price, imageUrl, description } = req.body;
-    const product = new Product(title,price, description,imageUrl, null,req.user._id)
+    const product = new Product({title:title, price:price, description:description, imageUrl:imageUrl})
     product.save()
         .then(user => {
         console.log(user);
@@ -62,7 +58,7 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchALl().then((products) => {
+    Product.find().then((products) => {
         res.render('admin/products', {
             prods: products,
             path: '/admin/products',
@@ -76,7 +72,7 @@ exports.getProducts = (req, res, next) => {
 exports.deleteProduct = (req, res, next) => {
     const productId = req.body.productId; // Get the product ID from the request body
     console.log(productId)
-    Product.deleteById(productId).then( result =>{
+    Product.findByIdAndDelete(productId).then( result =>{
         console.log(result)
     }).then(result=>{
         console.log(result)

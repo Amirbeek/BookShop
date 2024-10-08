@@ -8,7 +8,7 @@
     <schema id="3" parent="1" name="local"/>
     <schema id="4" parent="1" name="test">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2024-10-07.16:05:49</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-10-08.18:21:02</LastIntrospectionLocalTimestamp>
     </schema>
     <table id="5" parent="4" name="products"/>
     <table id="6" parent="4" name="users"/>
@@ -16,37 +16,49 @@
       <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
     </column>
-    <column id="8" parent="5" name="imageUrl">
+    <column id="8" parent="5" name="description">
       <DasType>String|12s</DasType>
       <Position>1</Position>
     </column>
-    <column id="9" parent="5" name="description">
+    <column id="9" parent="5" name="imageUrl">
       <DasType>String|12s</DasType>
-      <Position>2</Position>
+      <Position>1</Position>
     </column>
     <column id="10" parent="5" name="price">
-      <DasType>String|12s</DasType>
+      <DasType>Int32|4s</DasType>
+      <Position>1</Position>
+    </column>
+    <column id="11" parent="5" name="__v">
+      <DasType>Int32|4s</DasType>
       <Position>2</Position>
     </column>
-    <column id="11" parent="5" name="title">
+    <column id="12" parent="5" name="title">
       <DasType>String|12s</DasType>
-      <Position>3</Position>
-    </column>
-    <column id="12" parent="5" name="userId">
-      <DasType>ObjectId|12s</DasType>
-      <Position>4</Position>
+      <Position>2</Position>
     </column>
     <column id="13" parent="6" name="_id">
       <DasType>ObjectId|12s</DasType>
       <Position>1</Position>
     </column>
-    <column id="14" parent="6" name="email">
+    <column id="14" parent="6" name="__v">
+      <DasType>Int32|4s</DasType>
+      <Position>1</Position>
+    </column>
+    <column id="15" parent="6" name="email">
       <DasType>String|12s</DasType>
       <Position>1</Position>
     </column>
-    <column id="15" parent="6" name="username">
+    <column id="16" parent="6" name="name">
       <DasType>String|12s</DasType>
       <Position>1</Position>
+    </column>
+    <column id="17" parent="6" name="cart">
+      <DasType>Object|4999544s</DasType>
+      <Position>2</Position>
+    </column>
+    <column id="18" parent="6" name="cart.items">
+      <DasType>list|4999545s</DasType>
+      <Position>3</Position>
     </column>
   </database-model>
 </dataSource>
