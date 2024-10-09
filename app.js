@@ -17,17 +17,22 @@ const shopRoutes = require('./routes/shop.js');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req,res,next)=>{
-    User.findById('')
-        .then(user =>{
-            req.user = user
-            next()
+app.use((req, res, next) => {
+    User.findById('67058fd708c97a80cda6f425')
+        .then(user => {
+            if (!user) {
+                console.log('User not found');
+                return res.status(404).send('User not found'); // or redirect to a different route
+            }
+            req.user = user;
+            next();
         })
-        .catch(err=>{
-            console.log(err)
-        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).send('An error occurred while retrieving the user.');
+        });
+});
 
-})
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use((req,res,next)=>{

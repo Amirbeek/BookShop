@@ -29,6 +29,7 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 const { ObjectId } = require('mongodb');
+const {populate} = require("dotenv");
 
 exports.postEditProduct = (req, res, next) => {
     const productId = req.body.id;
@@ -47,18 +48,29 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const { title, price, imageUrl, description } = req.body;
-    const product = new Product({title:title, price:price, description:description, imageUrl:imageUrl})
-    product.save()
-        .then(user => {
-        console.log(user);
-        res.redirect('/admin/products')
-    }).catch(err => {
-        console.log(err)
+
+    const product = new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: imageUrl,
+        userId: req.user._id
     });
+    product.save()
+        .then(result => {
+            console.log(result);
+            res.redirect('/admin/products');
+        })
+        .catch(err => {
+            console.error('Error saving product:', err);
+            res.status(500).send('Error saving product');
+        });
 };
 
 exports.getProducts = (req, res, next) => {
-    Product.find().then((products) => {
+    Product.find()
+        .populate('userId')
+        .then(products => {
         res.render('admin/products', {
             prods: products,
             path: '/admin/products',
@@ -68,9 +80,10 @@ exports.getProducts = (req, res, next) => {
         console.log(err)
     });
 };
+
 //
 exports.deleteProduct = (req, res, next) => {
-    const productId = req.body.productId; // Get the product ID from the request body
+    const productId = req.body.productId;
     console.log(productId)
     Product.findByIdAndDelete(productId).then( result =>{
         console.log(result)
