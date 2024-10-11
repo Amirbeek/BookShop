@@ -115,36 +115,37 @@ exports.getOrders = (req, res, next) => {
 
 
 exports.postOrder = (req, res, next) => {
-    req.user
-        .populate('cart.items.productId')
+    User.findById(req.user._id)
+        .populate('cart.items.productId')  // Populate product details in the cart
         .then(user => {
             const cartProducts = user.cart.items.map(item => {
                 return {
-                    product: item.productId,
+                    product: { ...item.productId._doc },  // Use populated product details
                     quantity: item.quantity
                 };
             });
 
             const order = new Order({
                 user: {
-                    name: req.user.name,
-                    userId: req.user
+                    name: user.name,
+                    userId: user._id
                 },
-                products: cartProducts
+                products: cartProducts  // Make sure this field matches the schema
             });
 
             return order.save();
         })
         .then(result => {
-            req.user.cart.items = [];
-            return req.user.save();
+            req.user.cart.items = [];  // Clear the cart after the order is saved
+            return req.user.save();  // Save the cleared cart
         })
         .then(() => {
-            res.redirect('/orders');
+            res.redirect('/orders');  // Redirect to the orders page
         })
         .catch(err => {
             console.log(err);
             res.status(500).render('error', { errorMessage: 'Unable to place order.' });
         });
 };
+
 
