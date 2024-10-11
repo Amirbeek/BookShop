@@ -57,7 +57,9 @@ mongoose.connect('mongodb+srv://helloWorld:02012004Wa1111@cluster0.tc9vk.mongodb
         }).catch(err =>{
             console.log(err)
         })
-    app.listen(3030)
+    app.listen(3030, ()=>{
+        console.log("server is running on 3030")
+    })
 }).catch(err =>{
     console.log(err)
 })

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { model } = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -15,9 +14,9 @@ const userSchema = new Schema({
         items: [{
             productId: {
                 type: Schema.Types.ObjectId,
-                required: true
+                required: true,
+                ref: 'Product'
             },
-
             quantity: {
                 type: Number,
                 required: true
@@ -48,8 +47,7 @@ userSchema.methods.addToCart = function (product) {
     } else {
         updatedCartItems.push({
             productId: product._id,
-            quantity: newQuantity,
-            name: product.title
+            quantity: newQuantity
         });
     }
 
@@ -58,7 +56,6 @@ userSchema.methods.addToCart = function (product) {
     };
 
     this.cart = updatedCart;
-    console.log(updatedCart);
     return this.save();
 };
 
