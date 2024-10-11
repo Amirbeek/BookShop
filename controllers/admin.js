@@ -4,16 +4,17 @@ exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: "Add Shop",
         path: '/admin/add-product',
-        editing: false
+        editing: false,
+        isAuth: req.isLoginIn
     });
 };
 
 exports.getEditProduct = (req, res, next) => {
-    const editMode = req.query.edit; // Check if it's in edit mode
-    const productID = req.params.productId; // Get product ID from URL parameters
+    const editMode = req.query.edit;
+    const productID = req.params.productId;
     Product.findById(productID).then(product =>{
             if (!product) {
-                return res.redirect('/'); // Redirect if product not found
+                return res.redirect('/');
             }
             console.log("Controller: ")
             console.log(product)
@@ -21,7 +22,8 @@ exports.getEditProduct = (req, res, next) => {
                 pageTitle: "Edit Product",
                 path: '/admin/edit-product',
                 editing: editMode,
-                product: product // Pass the product data to the template
+                product: product,
+                isAuth: req.isLoginIn
             });
     }).catch(err =>{
         console.log(err)
@@ -75,6 +77,7 @@ exports.getProducts = (req, res, next) => {
             prods: products,
             path: '/admin/products',
             pageTitle: "Admin Products",
+            isAuth: req.isLoginIn
         });
     }).catch(err=>{
         console.log(err)

@@ -1,17 +1,17 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-// const mongoConnect = require('./util/database')
 const app = express();
 const User  = require('./models/user')
 const mongoose =  require('mongoose')
-
+const error= require('./controllers/error')
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 // Routes
 const adminRoutes = require('./routes/admin.js');
 const shopRoutes = require('./routes/shop.js');
+const auth = require('./routes/auth.js');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
         .then(user => {
             if (!user) {
                 console.log('User not found');
-                return res.status(404).send('User not found'); // or redirect to a different route
+                return res.status(404).send('User not found');
             }
             req.user = user;
             next();
@@ -35,11 +35,8 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use((req,res,next)=>{
-    res.status(404).render('404',{
-        pageTitle: "404 page"
-    })
-})
+app.use(auth);
+app.use(error.NotExistPage)
 mongoose.connect('mongodb+srv://helloWorld:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority')
     .then(result=>{
     console.log('Mongoose is connected! and app is running')
