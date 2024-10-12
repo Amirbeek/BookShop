@@ -7,12 +7,12 @@ const mongoConnect = (callback) => {
     MongoClient.connect(uri)
         .then(client => {
             console.log("Successfully Connected");
-            _db = client.db(); // Get the database instance
-            callback(); // Call the callback function after successful connection
+            _db = client.db();
+            callback();
         })
         .catch(err => {
             console.log("Database connection failed:", err);
-            throw err; // Rethrow the error for handling elsewhere if needed
+            throw err;
         });
 };
 

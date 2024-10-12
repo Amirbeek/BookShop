@@ -30,10 +30,8 @@ exports.shopProduct = (req,res,next)=>{
 }
 
 exports.getCart = (req, res, next) => {
-    // exports.getCart = (req, res, next) => {
-        // Fetch the user from the database using req.user._id
         User.findById(req.user._id)
-            .populate('cart.items.productId')  // Populating the product details
+            .populate('cart.items.productId')
             .then(user => {
                 const cartProducts = user.cart.items.map(item => {
                     return {
@@ -51,8 +49,6 @@ exports.getCart = (req, res, next) => {
             .catch(err => {
                 console.log(err);
             });
-
-
 };
 
 
