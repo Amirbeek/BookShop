@@ -1,21 +1,29 @@
-exports.getLogin =  (req,res,next)=>{
-    // const isLoggedIn = req.get('Cookie')
-    //         .split(';')[1]
-    //         .trim()
-    //         .split('=')[1] === 'true'
+const User = require('../models/user');
 
-    console.log(req.session.isLoggedIn)
-    res.render('auth/login',{
-        path:'/order',
-        pageTitle: 'Login',
-        isAuth: false
+exports.getLogin = (req, res, next) => {
+  res.render('auth/login', {
+    path: '/login',
+    pageTitle: 'Login',
+    isAuthenticated: false
+  });
+};
+
+exports.postLogin = (req, res, next) => {
+  User.findById('67058fd708c97a80cda6f425')
+    .then(user => {
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save(err => {
+        console.log(err);
+        res.redirect('/');
+      });
     })
-}
+    .catch(err => console.log(err));
+};
 
-exports.postLogin  =  (req,res,next)=>{
-    // res.setHeader('Set-Cookie', 'loggedIn=true;')
-    req.session.isLoggedIn = true
-    /* we can also use Expires, Max-age=10, Secure
-     HttpOnly you will not directly set your cookies because you rather use packages */
-    res.redirect('/login')
-}
+exports.postLogout = (req, res, next) => {
+  req.session.destroy(err => {
+    console.log(err);
+    res.redirect('/');
+  });
+};

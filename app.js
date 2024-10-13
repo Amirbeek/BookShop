@@ -1,75 +1,86 @@
 const path = require('path');
+
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
-const User  = require('./models/user')
-const mongoose =  require('mongoose')
+const mongoose = require('mongoose');
 const session = require('express-session');
-const MongoDbSession = require('connect-mongodb-session')(session)
-const error= require('./controllers/error')
-const MONGODB_URI ="mongodb+srv://helloWorld:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority"
+const MongoDBS = require('connect-mongodb-session')(session);
+
+const errorController = require('./controllers/error');
+const User = require('./models/user');
+
+const MONGODB_URI = "mongodb+srv://amir:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const app = express();
+
+const store = new MongoDBS({
+  uri: MONGODB_URI,
+  collection: 'sessions',
+    strict: true,
+    deprecationErrors: true,
+
+});
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-const store = new MongoDbSession({
-    uri: MONGODB_URI,
-    collection: 'session'
-})
-// Routes
-const adminRoutes = require('./routes/admin.js');
-const shopRoutes = require('./routes/shop.js');
-const auth = require('./routes/auth.js');
 
-// Middleware
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(session({
+app.use(
+  session({
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
     store: store
-}))
+  })
+);
 
 app.use((req, res, next) => {
-    User.findById('67058fd708c97a80cda6f425')
-        .then(user => {
-            if (!user) {
-                console.log('User not found');
-                return res.status(404).send('User not found');
-            }
-            req.user = user;
-            next();
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).send('An error occurred while retrieving the user.');
-        });
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
+    .then(user => {
+        if (!user) {
+            return next();
+        }
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
 });
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(auth);
-app.use(error.NotExistPage)
-mongoose.connect(MONGODB_URI)
-    .then(result=>{
-    console.log('Mongoose is connected! and app is running')
-        User.findOne().then(user=>{
-            if (!user){
-                const user= new User({
-                    name:"amir",
-                    email:"amir@gmail.com",
-                    cart:{
-                        items:[]
-                    }
-                })
-                user.save()
-            }
-        }).catch(err =>{
-            console.log(err)
-        })
-    app.listen(3030, ()=>{
-        console.log("server is running on 3030")
+app.use(authRoutes);
+
+app.use(errorController.get404);
+
+mongoose
+    .connect(MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
     })
-}).catch(err =>{
-    console.log(err)
-})
+    .then(result => {
+        User.findOne().then(user => {
+            if (!user) {
+                const user = new User({
+                    name: 'Max',
+                    email: 'max@test.com',
+                    cart: {
+                        items: []
+                    }
+                });
+                user.save();
+            }
+        });
+        console.log(result)
+        app.listen(3000);
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
