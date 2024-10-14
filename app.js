@@ -9,15 +9,12 @@ const MongoDBS = require('connect-mongodb-session')(session);
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
-const MONGODB_URI = "mongodb+srv://amir:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const MONGODB_URI = 'mongodb+srv://amir:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
 const app = express();
 
 const store = new MongoDBS({
   uri: MONGODB_URI,
   collection: 'sessions',
-    strict: true,
-    deprecationErrors: true,
-
 });
 
 app.set('view engine', 'ejs');
@@ -65,19 +62,7 @@ mongoose
         useUnifiedTopology: true
     })
     .then(result => {
-        User.findOne().then(user => {
-            if (!user) {
-                const user = new User({
-                    name: 'Max',
-                    email: 'max@test.com',
-                    cart: {
-                        items: []
-                    }
-                });
-                user.save();
-            }
-        });
-        console.log(result)
+
         app.listen(3000);
     })
     .catch(err => {
