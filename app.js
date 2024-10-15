@@ -1,5 +1,5 @@
 const path = require('path');
-const csrf = require('csrf');
+const csrf = require('csurf');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
