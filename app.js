@@ -5,11 +5,11 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBS = require('connect-mongodb-session')(session);
-
+const flash =require('connect-flash')
 const errorController = require('./controllers/error');
 const User = require('./models/user');
 
-const MONGODB_URI = 'mongodb+srv://amir:02012004Wa1111@cluster0.tc9vk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.DATABASE_URL;
 const app = express();
 
 // Set up MongoDB session store
@@ -47,6 +47,7 @@ app.use(
 // Use CSRF protection middleware after session middleware
 app.use(csrfProtection);
 
+app.use(flash())
 
 // User authentication middleware
 app.use((req, res, next) => {
