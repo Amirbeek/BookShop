@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const sendGrid = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto')
-
+const { validationResult } = require('express-validator');
 
 
 const transporter = sendGrid.createTransport(sendgridTransport({
@@ -22,86 +22,102 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
         path: '/login',
         pageTitle: 'Login',
-        errorMessage:message
+        errorMessage:message,
+        oldInput: {
+            email: '',
+            password: '',
+        },
+        validationErrors: []
     });
 };
 
 exports.getSignUp = (req, res, next) => {
-    let message =  req.flash('errorSign')
-    if (message.length > 0 ){
-        message = message[0]
-    }else {
-        message = null
+    let message = req.flash('errorSign');
+    if (message.length > 0) {
+        message = message[0];
+    } else {
+        message = null;
     }
 
     res.render('auth/signup', {
         path: '/signup',
         pageTitle: 'Sign up',
         isAuthenticated: false,
-        errorMessage:message
+        errorMessage: message,
+        oldInput: {
+            email: '',
+            password: '',
+            confirm_password: ''
+        },
+        validationErrors: []
     });
 };
 
 exports.postLogin = async (req, res, next) => {
-    const { email, password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        // Handle validation errors
+        return res.status(422).render('auth/login', {
+            path: '/login',
+            pageTitle: 'Login',
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: req.body.email,
+                password: req.body.password,
+            },
+            validationErrors: errors.array()
+        });
+    }
 
+    const { email } = req.body;
     try {
         const user = await User.findOne({ email: email });
-
-        if (!user) {
-            // No user found, redirect to login with error
-            req.flash('error', 'Invalid email or password')
-            return res.redirect('/login');
-        }
-
-        // Compare the hashed password
-        const doMatch = await bcrypt.compare(password, user.password);
-
-        if (doMatch) {
-            // Passwords match, log in the user
-            req.session.isLoggedIn = true;
-            req.session.user = user;
-
-            await req.session.save(err => {
-                if (err) {
-                    console.log(err);
-                }
-                res.redirect('/');
-            });
-
-        } else {
-            req.flash('error', 'Invalid email or password')
-            return res.redirect('/login');
-        }
+        req.session.isLoggedIn = true;
+        req.session.user = user;
+        await req.session.save(err => {
+            if (err) {
+                console.log(err);
+                return next(err);
+            }
+            res.redirect('/');
+        });
     } catch (err) {
         console.log(err);
-        res.redirect('/login');
+        next(err);
     }
 };
 
 exports.postSignUp = async (req, res, next) => {
-    const { email, password, confirm_password } = req.body;
+    const { email, password } = req.body;
+    const errors = validationResult(req);
 
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/signup', {
+            path: '/signup',
+            pageTitle: 'Sign Up',
+            errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: req.body.email,
+                password: req.body.password,
+                confirm_password: req.body.confirm_password
+            },
+            validationErrors: errors.array(), // Make sure this is present
+        });
+    }
     try {
-        const userDoc = await User.findOne({ email: email });
-        if (userDoc) {
-            req.flash('errorSign', 'Email already exists');
-            return res.redirect('/signup');
-        }
-
         const hashedPassword = await bcrypt.hash(password, 12);
+
         const user = new User({
             email: email,
             password: hashedPassword,
-            cart: { items: [] },
+            cart: { items: [] }
         });
 
         await user.save();
 
-        // Send a beautified confirmation email
         transporter.sendMail({
             to: email,
-            from: 'shomurodovamirbek2@gmail.com', // Use a verified SendGrid sender identity
+            from: 'shomurodovamirbek2@gmail.com',
             subject: 'Signup Successful',
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e5e5; border-radius: 10px;">
@@ -129,7 +145,7 @@ exports.postSignUp = async (req, res, next) => {
         res.redirect('/login');
     } catch (err) {
         console.log(err);
-        res.redirect('/signup');
+        next(err); // Error handling
     }
 };
 
@@ -185,6 +201,7 @@ exports.postReset = (req,res, next)=>{
         })
     })
 }
+
 exports.getNewPassword = (req,res, next)=>{
     const token = req.params.token
     User.findOne({resetToken: token, resetTokenExpiration: {$gt: Date.now()}}).then(user =>{
@@ -206,6 +223,7 @@ exports.getNewPassword = (req,res, next)=>{
         message = null
     }
 }
+
 exports.postNewPassword = (req, res, next) => {
     const newPassword = req.body.password;
     const userId = req.body.userId;
