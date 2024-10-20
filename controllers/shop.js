@@ -18,18 +18,25 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(product => {
-      res.render('shop/product-detail', {
-        product: product,
-        pageTitle: product.title,
-        path: '/products',
-        isAuthenticated: req.session.isLoggedIn
-      });
-    })
-    .catch(err => console.log(err));
+    const prodId = req.params.productId;
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                return res.redirect('/'); // Or render an error page
+            }
+            res.render('shop/product-detail', {
+                product: product,
+                pageTitle: product.title,
+                path: '/products',
+                isAuthenticated: req.session.isLoggedIn
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.redirect('/'); // Redirect or render an error page
+        });
 };
+
 
 exports.getIndex = (req, res, next) => {
   Product.find()
@@ -48,20 +55,25 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then(user => {
-      const products = user.cart.items;
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products,
-        isAuthenticated: req.session.isLoggedIn
-      });
-    })
-    .catch(err => console.log(err));
+    if (!req.user) {
+        return res.redirect('/'); // or an error page
+    }
+
+    req.user
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user => {
+            const products = user.cart.items;
+            res.render('shop/cart', {
+                path: '/cart',
+                pageTitle: 'Your Cart',
+                products: products,
+                isAuthenticated: req.session.isLoggedIn
+            });
+        })
+        .catch(err => console.log(err));
 };
+
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
@@ -85,30 +97,32 @@ exports.postCartDeleteProduct = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
-exports.postOrder = (req, res, next) => {
-  req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then(user => {
-      const products = user.cart.items.map(i => {
-        return { quantity: i.quantity, product: { ...i.productId._doc } };
-      });
-      const order = new Order({
-        user: {
-            email: req.user.email,
-            userId: req.user
-        },
-        products: products
-      });
-      return order.save();
-    })
-    .then(result => {
-      return req.user.clearCart();
-    })
-    .then(() => {
-      res.redirect('/orders');
-    })
-    .catch(err => console.log(err));
+exports.postOrder = async (req, res, next) => {
+    if (!req.user) {
+        return res.redirect('/'); // or an error page
+    }
+
+    try {
+        const user = await req.user.populate('cart.items.productId').execPopulate();
+        const products = user.cart.items.map(i => {
+            return { quantity: i.quantity, product: { ...i.productId._doc } };
+        });
+
+        const order = new Order({
+            user: {
+                email: req.user.email,
+                userId: req.user
+            },
+            products: products
+        });
+
+        await order.save();
+        await req.user.clearCart();
+        res.redirect('/orders');
+    } catch (err) {
+        console.log(err);
+        res.redirect('/'); // Redirect or render an error page
+    }
 };
 
 exports.getOrders = (req, res, next) => {

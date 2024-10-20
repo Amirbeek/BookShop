@@ -35,28 +35,31 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getEditProduct = (req, res, next) => {
-  const editMode = req.query.edit;
-  if (!editMode) {
-     return res.redirect('/');
-  }
-  if (req.session.isLoggedIn){
-      return res.redirect('/')
-  }
-  const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(product => {
-      if (!product) {
+    const editMode = req.query.edit;
+    if (!editMode) {
         return res.redirect('/');
-      }
-      res.render('admin/edit-product', {
-        pageTitle: 'Edit Product',
-        path: '/admin/edit-product',
-        editing: editMode,
-        product: product,
-        isAuthenticated: req.session.isLoggedIn
-      });
-    })
-    .catch(err => console.log(err));
+    }
+
+    // Check if the user is not logged in
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/');
+    }
+
+    const prodId = req.params.productId;
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                return res.redirect('/');
+            }
+            res.render('admin/edit-product', {
+                pageTitle: 'Edit Product',
+                path: '/admin/edit-product',
+                editing: editMode,
+                product: product,
+                isAuthenticated: req.session.isLoggedIn
+            });
+        })
+        .catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -68,21 +71,26 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then(product => {
+        // protection that user can delete they own product
+        console.log('product user id: ' + product.userId.toString())
+        console.log('user id: ' + req.user._id.toString())
+        if (product.userId.toString() !== req.user._id.toString()){
+            return res.redirect('/')
+        }
       product.title = updatedTitle;
       product.price = updatedPrice;
       product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
-      return product.save();
-    })
-    .then(result => {
-      console.log('UPDATED PRODUCT!');
-      res.redirect('/admin/products');
+      return product.save().then(result => {
+          console.log('UPDATED PRODUCT!');
+          res.redirect('/admin/products');
+      });
     })
     .catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({userId:  req.user._id}) // Auth product secure
     // .select('title price -_id')
     // .populate('userId', 'name')
     .then(products => {
@@ -99,7 +107,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
+  Product.deleteOne({_id: prodId ,userId: req.user._id})
     .then(() => {
       console.log('DESTROYED PRODUCT');
       res.redirect('/admin/products');
