@@ -27,7 +27,7 @@ exports.getLogin = (req, res, next) => {
             email: '',
             password: '',
         },
-        validationErrors: []
+        validationErrors: null
     });
 };
 
@@ -49,7 +49,7 @@ exports.getSignUp = (req, res, next) => {
             password: '',
             confirm_password: ''
         },
-        validationErrors: []
+        validationErrors: null
     });
 };
 

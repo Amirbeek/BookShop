@@ -12,15 +12,17 @@ router.post('/logout', authController.postLogout)
 router.post('/login',
     check('email','Please enter a valid email address.')
         .isEmail()
+        .normalizeEmail()
         .custom((value, { req }) => {
             return User.findOne({ email: value }).then(UserDoc => {
                 if (!UserDoc) {
-                    return Promise.reject('E-mail did not exist!');
+                    return Promise.reject('E-mail is not exist!');
                 }
             });
         }),
     body('password', 'Password must be at least 6 characters long and alphanumeric.')
         .isLength({ min: 6 })
+        .trim()
         .custom((value, { req }) => {
             return User.findOne({ email: req.body.email }).then(async user => {
                 if (!user) {
@@ -39,6 +41,7 @@ router.post('/login',
 router.post('/signup',
     check('email','Please enter a valid email address.')
         .isEmail()
+        .normalizeEmail()
         .custom((value, { req }) => {
             return User.findOne({ email: value }).then(UserDoc => {
                 if (UserDoc) {
@@ -48,8 +51,10 @@ router.post('/signup',
         }),
     body('password', 'Password must be at least 6 characters long and alphanumeric.')
         .isLength({ min: 6 })
-        .isAlphanumeric(),
+        .isAlphanumeric()
+    .trim(),
     body('confirm_password')
+        .trim()
         .custom((value, { req }) => {
             if (value !== req.body.password) {
                 throw new Error('Passwords must match, please check your password!');

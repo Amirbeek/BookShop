@@ -9,7 +9,15 @@
   width: 100%;
   margin-bottom: 0.25rem;
 }
-
+.usr_err_message{
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
+.invalid{
+  border: 1px solid Red;
+  background-color: red;
+}
 .form-control input,
 .form-control textarea {
   border: 1px solid #a1a1a1;
