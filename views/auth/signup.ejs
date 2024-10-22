@@ -16,15 +16,15 @@
         <%}%>
         <div class="form-control">
             <label for="email">E-Mail</label>
-            <input type="email" name="email" id="email" value="<%= oldInput.email %>" class="<%= validationErrors.find(e => e.param === 'email') ? 'invalid' : '' %>">
+            <input type="email" name="email" id="email" value="<%= oldInput.email %>" class="<%= validationErrors.find(e => e.path === 'email') ? 'invalid' : '' %>">
         </div>
         <div class="form-control">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" value="<%= oldInput.password%>" class="<%=  validationErrors.find(e => e.param === 'password') ? 'invalid' : '' %>">
+            <input type="password" name="password" id="password" value="<%= oldInput.password%>" class="<%=  validationErrors.find(e => e.path === 'password') ? 'invalid' : '' %>">
         </div>
         <div class="form-control">
             <label for="confirm_password">Confirm Password</label>
-            <input type="password" name="confirm_password" id="confirm_password" value="<%= oldInput.confirm_password%>" class="<%=  validationErrors.find(e => e.param === 'confirm_password') ? 'invalid' : '' %>">
+            <input type="password" name="confirm_password" id="confirm_password" value="<%= oldInput.confirm_password%>" class="<%=  validationErrors.find(e => e.path === 'confirm_password') ? 'invalid' : '' %>">
         </div>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <button class="btn" type="submit">Sign up</button>
