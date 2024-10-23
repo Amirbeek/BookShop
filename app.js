@@ -58,6 +58,7 @@ app.use(multer({
     fileFilter: fileFilter,
     limits: { fileSize: 1024 * 1024 * 5 }
 }).single('image'));
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images',express.static(path.join(__dirname, 'images')));
@@ -113,6 +114,7 @@ mongoose
     .then(result => {
         app.listen(3000, () => {
             console.log('Server is running on port 3000');
+            
         });
     })
     .catch(err => {
