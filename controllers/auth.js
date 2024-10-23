@@ -56,7 +56,6 @@ exports.getSignUp = (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        // Handle validation errors
         return res.status(422).render('auth/login', {
             path: '/login',
             pageTitle: 'Login',
@@ -82,8 +81,9 @@ exports.postLogin = async (req, res, next) => {
             res.redirect('/');
         });
     } catch (err) {
-        console.log(err);
-        next(err);
+        const error = new Error(err);
+        error.httpStatusCode = 500
+        return next(error)
     }
 };
 
@@ -101,12 +101,11 @@ exports.postSignUp = async (req, res, next) => {
                 password: req.body.password,
                 confirm_password: req.body.confirm_password
             },
-            validationErrors: errors.array(), // Make sure this is present
+            validationErrors: errors.array(),
         });
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 12);
-
         const user = new User({
             email: email,
             password: hashedPassword,
@@ -144,8 +143,9 @@ exports.postSignUp = async (req, res, next) => {
 
         res.redirect('/login');
     } catch (err) {
-        console.log(err);
-        next(err); // Error handling
+        const error = new Error(err);
+        error.httpStatusCode = 500
+        return next(error)
     }
 };
 
@@ -214,7 +214,9 @@ exports.getNewPassword = (req,res, next)=>{
             passwordToken: token
         });
     }).catch(err =>{
-        console.log(err)
+        const error = new Error(err);
+        error.httpStatusCode = 500
+        return next(error)
     })
     let message =  req.flash('error')
     if (message.length > 0 ){
@@ -251,6 +253,8 @@ exports.postNewPassword = (req, res, next) => {
             res.redirect('/login');
         })
         .catch(err => {
-            console.log(err);
+            const error = new Error(err);
+            error.httpStatusCode = 500
+            return next(error)
         });
 };

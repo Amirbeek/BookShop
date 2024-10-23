@@ -1,6 +1,5 @@
 require('dotenv').config();
-console.log("MongoDB URI:", process.env.MONGO_URI); // Check if the URI is being loaded correctly
-
+console.log("MongoDB URI:", process.env.MONGO_URI);
 const path = require('path');
 const csrf = require('csurf');
 const express = require('express');
@@ -11,10 +10,10 @@ const MongoDBS = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
 const errorController = require('./controllers/error');
 const User = require('./models/user');
-
+const multer = require('multer')
 const app = express();
 
-// Set up MongoDB session store
+
 const store = new MongoDBS({
     uri: process.env.MONGO_URI,
     collection: 'sessions',
@@ -28,9 +27,40 @@ app.set('views', 'views');
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
+const {diskStorage} = require("multer");
 
+
+
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname);
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (
+        file.mimetype === 'image/jpeg' ||
+        file.mimetype === 'image/png' ||
+        file.mimetype === 'image/jpg'
+    ) {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+};
+
+// BodyParse and Multer middleware setup
+app.use(multer({
+    storage: fileStorage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 1024 * 1024 * 5 }
+}).single('image'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images',express.static(path.join(__dirname, 'images')));
 
 app.use(
     session({
@@ -41,7 +71,7 @@ app.use(
     })
 );
 
-app.use(csrfProtection);
+
 app.use(flash());
 
 app.use((req, res, next) => {
@@ -58,10 +88,10 @@ app.use((req, res, next) => {
         })
         .catch(err => {
             console.error('Error fetching user:', err);
-            next(); // Call next to continue handling the request
+            next(new Error(err))
         });
 });
-
+app.use(csrfProtection);
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
@@ -72,8 +102,9 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.use(errorController.get404);
 
+app.use('/500', errorController.get500)
+app.use(errorController.get404);
 mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
@@ -85,5 +116,5 @@ mongoose
         });
     })
     .catch(err => {
-        console.error('Database connection error:', err);
+        throw new Error(err)
     });

@@ -16,7 +16,6 @@ const router = express.Router();
           .isString()
           .isLength({min: 3})
           .trim(),
-      body('imageUrl').isURL(),
       body('price').isFloat(),
       body('description').isLength({min:5 ,max :600}).trim()
     ],isAuth, adminController.postAddProduct);
@@ -28,7 +27,6 @@ const router = express.Router();
             .isString()
             .isLength({min: 3})
             .trim(),
-        body('imageUrl').isURL(),
         body('price').isFloat(),
         body('description').isLength({min:5 ,max :600}).trim()
     ],isAuth, adminController.postEditProduct);

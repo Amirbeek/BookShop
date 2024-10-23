@@ -1,6 +1,8 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
-
+const fs = require('fs')
+const path = require('path')
+const {or} = require("sequelize");
 exports.getProducts = (req, res, next) => {
   Product.find()
     .then(products => {
@@ -135,4 +137,29 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(err => console.log(err));
+};
+
+exports.getInvoice = (req, res, next) => {
+    const orderID = req.params.orderId;
+    Order.findById(orderID).then(order=>{
+        if (!order){
+            return next(new Error("No Order found"))
+        }
+        if (order.user.userId.toString() !== req.user._id.toString()){
+            return next(new Error('Unauthorized'))
+        }
+        const invoiceName = 'invoice-' + orderID + '.pdf';
+        const invoicePath = path.join('data', 'invoice', invoiceName); // Use resolve for better path handling
+
+        fs.readFile(invoicePath, (err, data) => {
+
+
+            res.setHeader('Content-Type', 'application/pdf'); // inline help us to open pdf on one page
+            res.setHeader('Content-Disposition', `inline; filename="${invoiceName}"`); // Optional: download prompt
+            res.send(data);
+        });
+    }).catch(err=>{
+        console.log(err)
+    })
+
 };
