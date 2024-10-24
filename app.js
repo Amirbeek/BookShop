@@ -103,7 +103,6 @@ app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-
 app.use('/500', errorController.get500)
 app.use(errorController.get404);
 mongoose
@@ -114,9 +113,9 @@ mongoose
     .then(result => {
         app.listen(3000, () => {
             console.log('Server is running on port 3000');
-            
+
         });
     })
     .catch(err => {
-        throw new Error(err)
+        console.log(err)
     });

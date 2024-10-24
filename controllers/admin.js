@@ -1,6 +1,6 @@
 const Product = require('../models/product');
 const { validationResult } = require('express-validator');
-
+const fileHelper = require('../util/file')
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
         pageTitle: 'Add Product',
@@ -58,13 +58,13 @@ exports.postAddProduct = (req, res, next) => {
         price: price,
         description: description,
         imageUrl: imageUrl,
-        userId: req.user // ensure req.user is defined
+        userId: req.user
     });
 
     product
         .save()
         .then(result => {
-            res.redirect('/admin/products'); // redirect to a product list or confirmation page
+            res.redirect('/admin/products');
         })
         .catch(err => {
             console.error(err); // log the error for debugging
@@ -103,7 +103,7 @@ exports.getEditProduct = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log(err); // Log the actual error
+            console.log(err);
             const error = new Error(err);
             error.httpStatusCode = 500;
             return next(error);
@@ -150,6 +150,7 @@ exports.postEditProduct = (req, res, next) => {
             product.price = updatedPrice;
             product.description = updatedDesc;
             if (image){
+                fileHelper.deleteFile(product.imageUrl);
                 product.imageUrl = image.path;
             }
             return product.save();
@@ -185,14 +186,22 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.deleteOne({ _id: prodId, userId: req.user._id })
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                return next(new Error('Product not found'));
+            }
+            fileHelper.deleteFile(product.imageUrl);
+            return Product.deleteOne({ _id: prodId, userId: req.user._id });
+        })
         .then(() => {
             console.log('DESTROYED PRODUCT');
             res.redirect('/admin/products');
         })
         .catch(err => {
             const error = new Error(err);
-            error.httpStatusCode = 500
-            return next(error)
+            error.httpStatusCode = 500;
+            return next(error);
         });
 };
+
