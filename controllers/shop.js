@@ -1,9 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const stripe = require('stripe')(process.env.STRIPE_SK);
-
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const PDFDocument = require('pdfkit');
-
 const Product = require('../models/product');
 const Order = require('../models/order');
 
@@ -91,22 +89,28 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then(user => {
-      const products = user.cart.items;
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    // Check if user is defined
+    if (!req.user) {
+        const error = new Error('User not authenticated.');
+        error.httpStatusCode = 401;
+        return next(error);
+    }
+    console.log(stripe)
+    req.user
+        .populate('cart.items.productId')
+        .then(user => {
+            const products = user.cart.items;
+            res.render('shop/cart', {
+                path: '/cart',
+                pageTitle: 'Your Cart',
+                products: products,
+            });
+        })
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.postCart = (req, res, next) => {
@@ -141,47 +145,57 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
-  let products;
-  let total = 0;
-  req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then(user => {
-      products = user.cart.items;
-      total = 0;
-      products.forEach(p => {
-        total += p.quantity * p.productId.price;
-      });
+    let products;
+    let total = 0;
 
-      return stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: products.map(p => {
-          return {
-            name: p.productId.title,
-            description: p.productId.description,
-            amount: p.productId.price * 100,
-            currency: 'usd',
-            quantity: p.quantity
-          };
-        }),
-        success_url: req.protocol + '://' + req.get('host') + '/checkout/success', // => http://localhost:3000
-        cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel'
-      });
-    })
-    .then(session => {
-      res.render('shop/checkout', {
-        path: '/checkout',
-        pageTitle: 'Checkout',
-        products: products,
-        totalSum: total,
-        sessionId: session.id
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
-    });
+    // Check if user is authenticated
+    if (!req.user) {
+        const error = new Error('User not authenticated.');
+        error.httpStatusCode = 401;
+        return next(error);
+    }
+
+    // Populate the cart items with product details
+    req.user
+        .populate('cart.items.productId')
+        .then(user => {
+            products = user.cart.items;
+
+            total = products.reduce((acc, p) => acc + p.quantity * p.productId.price, 0);
+
+            return stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: products.map(p => {
+                    return {
+                        name: p.productId.title,
+                        description: p.productId.description,
+                        amount: p.productId.price * 100,
+                        currency: 'usd',
+                        quantity: p.quantity
+                    };
+                }),
+                success_url: `${req.protocol}://${req.get('host')}/checkout/success`,
+                cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`
+            });
+        })
+        .then(session => {
+            console.log('Stripe Session created:', session);
+            res.render('shop/checkout', {
+                path: '/checkout',
+                pageTitle: 'Checkout',
+                products: products,
+                totalSum: total,
+                sessionId: session.id
+            });
+        })
+        .catch(err => {
+            console.error('Error during checkout process:', err);
+            console.error('Full error details:', err.raw);
+            const error = new Error(err.message || 'Checkout session creation failed.');
+            error.httpStatusCode = 500;
+            return next(error);
+        });
+
 };
 
 exports.getCheckoutSuccess = (req, res, next) => {
